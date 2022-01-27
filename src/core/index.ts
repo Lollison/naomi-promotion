@@ -1,4 +1,4 @@
-import { expose } from "threads";
+import { expose } from 'threads';
 import { ClientEntity } from "../client/clientEntity";
 import { HttpsProxyAgent } from "hpagent";
 import { util } from '../util'
@@ -84,8 +84,7 @@ class NaomiProducer { // cluster if NaomiWatchers
 
 expose({
 
-    start(id, amount, duration, data: Array<Object>)
-    {
+    start: function (id, amount, duration, data: Array<Object>) {
         return new Promise((resolve, reject) => {
 
             const cluster = new NaomiProducer()
@@ -112,7 +111,29 @@ expose({
 
                 const wrapped = new NaomiWatcher(client, id)
 
-                wrapped.query.domain('api64.ipify.org').request('GET').then(result => {
+                wrapped.initYoutubePlayer().then(res => {
+                    console.log(`[${watcher['proxy']}] YT Player inited`)
+
+                    const ytPlayerResponse = JSON.parse(res['body'])
+
+                    for (let i = 0; i < ytPlayerResponse['streamingData']['adaptiveFormats'].length; i++) {
+                        if(ytPlayerResponse['streamingData']['adaptiveFormats'][i]['bitrate'] == 80000) // 144p
+                        {
+                            const videoplaybackRequest = new URL(ytPlayerResponse['streamingData']['adaptiveFormats'][i]['url'])
+                            videoplaybackRequest.searchParams.append("cpn", wrapped['data']['watcherId'])
+                            videoplaybackRequest.searchParams.append("rbuf", "0")
+
+                            wrapped.query.domain(videoplaybackRequest.host).request('GET', 'videoplayback' + videoplaybackRequest.search).then(res => {
+                                console.log(res.body)
+                            })
+
+                        }
+                    }
+
+                    cluster.add(wrapped)
+                })
+
+                /*wrapped.query.domain('api64.ipify.org').request('GET').then(result => {
                     console.log(`[${watcher['proxy']}]`, result.body)
 
                     wrapped.initYoutubePlayer().then(res => {
@@ -126,7 +147,7 @@ expose({
                         })
                     })
 
-                })
+                })*/
 
 
             })

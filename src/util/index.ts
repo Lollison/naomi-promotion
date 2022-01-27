@@ -20,6 +20,135 @@ export class Util {
         return randomArray.join("");
     }
 
+    ytFunc_DA(a, b) { // line: 17692
+        if (8 > a.byteLength - b)
+            return !1;
+        let c = a.getUint32(b);
+        if (8 > c || a.byteLength - b < c)
+            return !1;
+        c = a.getUint32(b + 4);
+        if (1635148593 === c || 1635148611 === c || 1937126244 === c || 1936995172 === c)
+            return !0;
+        for (c = 4; 8 > c; c++) {
+            let d = a.getInt8(b + c);
+            if (97 > d || 122 < d)
+                return !1
+        }
+        return !0
+    }
+
+    ytFunc_oA = function(a, b, c, d, e) { // line: 17417
+        e = void 0 === e ? !1 : e;
+        this.data = a;
+        this.offset = b;
+        this.size = c;
+        this.type = d;
+        this.i = (this.j = e) ? 0 : 8;
+        this.dataOffset = this.offset + this.i
+    }
+
+    ytFunc_EA = function(a, b) { // line: 17654
+        let c = a.getUint32(b)
+            , d = a.getUint32(b + 4);
+        // @ts-ignore
+        return new util.ytFunc_oA(a,b,c,d)
+    }
+
+    ytFunc_yA = function(a) { // line: 17528
+        let b = {};
+        a = a.split("\r\n");
+        for (let c = 0; c < a.length; c++) {
+            if (0 === a[c].length)
+                return b;
+            let d = a[c].match(/([^:]+):\s+([\S\s]+)/);
+            null != d && (b[d[1]] = d[2])
+        }
+        return null
+    }
+
+    ytFunc_CA = function(a, b, c) { // line: 17625
+        for (; util.ytFunc_DA(a, b); ) {
+            let d = util.ytFunc_EA(a, b);
+            if (d.type === c)
+                return d;
+            b += d.size
+        }
+        return null
+    }
+
+    ytFunc_hA = function(a) { // line:17355
+        return String.fromCharCode.apply(null, a)
+    }
+
+    ytFunc_jA = function(a) { // line: 17359
+        return iA ? iA.decode(a) : util.ytFunc_hA(a)
+    }
+
+    ytFunc_uA = function(a, b) { // line:17459
+        b = void 0 === b ? NaN : b;
+        if (isNaN(b))
+            var c = a.size;
+        else
+            for (c = a.i; c < a.size && a.data.getUint8(a.offset + c) !== b; )
+                ++c;
+        b = new Uint8Array(a.data.buffer,a.offset + a.i + a.data.byteOffset,c - a.i);
+        a.i = Math.min(c + 1, a.size);
+        return util.ytFunc_jA(b)
+    }
+
+    ytFunc_sA = function(a) { // line:17445
+        let b = a.data.getUint32(a.offset + a.i);
+        a.i += 4;
+        return b
+    }
+
+    ytFunc_Upa = function(a) { // line:17713
+        a.skip(4);
+        return {
+            uY: util.ytFunc_uA(a, 0),
+            value: util.ytFunc_uA(a, 0),
+            FH: util.ytFunc_sA(a),
+            zfa: util.ytFunc_sA(a),
+            Zea: util.ytFunc_sA(a),
+            id: util.ytFunc_sA(a),
+            OM: util.ytFunc_uA(a),
+            offset: a.offset
+        }
+    }
+
+    ytFunc_wA = function(a, b) { // line:17506
+        return Number(a.data[b]) || 0
+    }
+
+    ytFunc_xA = function(a, b) { // line:17481
+        this.data = a;
+        this.uri = b || "http://youtube.com/streaming/metadata/segment/102015";
+        this.i = util.ytFunc_wA(this, "Sequence-Number");
+        this.I = util.ytFunc_wA(this, "Segment-Count");
+        this.J = this.data["Segment-Durations-Ms"] || "";
+        this.ingestionTime = util.ytFunc_wA(this, "Ingestion-Walltime-Us") / 1E6;
+        this.j = (util.ytFunc_wA(this, "First-Frame-Time-Us") + util.ytFunc_wA(this, "First-Frame-Uncertainty-Us")) / 1E6;
+        this.dj = util.ytFunc_wA(this, "Target-Duration-Us") / 1E6;
+        this.B = "T" === this.data["Stream-Finished"];
+        this.C = "T" === this.data.Streamable;
+        this.cryptoPeriodIndex = util.ytFunc_wA(this, "Crypto-Period-Index");
+        this.u = util.ytFunc_wA(this, "Crypto-Period-Seconds")
+    }
+
+    getSegmentInfo(a) { // line: 17727 // a = ??? (определить происхождение)
+        let b = util.ytFunc_CA(a, 0, 1701671783);
+        if (!b)
+            return null;
+
+        let c = util.ytFunc_Upa(b)
+            , d = c.uY;
+
+        c = util.ytFunc_yA(c.OM);
+
+        return c ? new util.ytFunc_xA(c,d) : null
+
+    }
+
     generateRandomNumber(from, to) {
         return Math.floor(Math.random() * to) + from;
     }

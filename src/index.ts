@@ -6,7 +6,7 @@ console.log('Naomi Promotion vDEV')
 
 proxyCore.load().then((amount: number) => {
     console.log(`[PROXY CORE] Check completed. Valid proxies: ${amount}`)
-    clientEntityCluster.addTask('nIso825-Ko4', amount, 12).then(console.log)
+    clientEntityCluster.addTask('3IdDTyu2QEc', amount, 12).then(console.log)
 })
 
 setTimeout(() => {
